@@ -1,0 +1,46 @@
+<html>
+    <h1>Hi There!</h1>
+
+    <h1>Chatting....with <%= groupName %> </h1>
+
+    <input type = "text" id="chatbox">
+
+    <button id="send">Send</button>
+
+    <ul id="msgList">
+        <% for (let i = 0; i < chatHistory.length; i++) {%>
+            <li> <%= chatHistory[i].sender %> - <%= chatHistory[i].content %></li>
+            <% } %>
+    </ul>
+
+
+
+
+    <script src = "/socket.io/socket.io.js"></script>
+    <script>
+    console.log("Started Client...");
+    var socket = io();
+    socket.emit('join_room', {
+        roomId: '<%= roomId %>'
+    });
+    let input = document.getElementById("chatbox");
+    let msgList = document.getElementById("msgList");
+    let send = document.getElementById("send");
+
+    send.addEventListener('click', ()=> {
+        let msg = input.value;
+        socket.emit('new_msg', {
+            roomId: '<%= roomId %>',
+            message: msg,
+            sender: '<%= user %>'
+        })
+    });
+
+    socket.on('msg_recvd', (data)=> {
+        let msg = document.createElement("li");
+        msg.textContent = data.sender +" - "+ data.message;
+        msgList.appendChild(msg);
+    });
+
+    </script>
+</html>
